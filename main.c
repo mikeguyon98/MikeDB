@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #define TABLE_SIZE 1000
 
@@ -64,7 +65,7 @@ char *get(const char *key){
                 return pair->val;
             } else {
                 if (prev == NULL){
-                    pair = pair->next;
+                    hash_table[slot] = pair->next;
                 } else {
                     prev->next = pair -> next;
                 }
@@ -113,6 +114,8 @@ int main() {
     set(pair_1.key, pair_1.val, 2000);
     set(pair_2.key, pair_2.val, 2000);
     set(pair_3.key, pair_3.val, 1);
+
+    sleep(2);
 
 
     char *key_1 = "123";
