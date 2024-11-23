@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -81,6 +82,30 @@ char *get(const char *key){
     return NULL;
 }
 
+bool delete(const char *key){
+    unsigned int slot = hash(key);
+    kv_pair_t *pair = hash_table[slot];
+    kv_pair_t *prev = NULL;
+    time_t now = time(NULL);
+
+    while (pair != NULL){
+        if(strcmp(key, pair->key)){
+            if(prev==NULL){
+                hash_table[slot] = pair->next;
+            } else {
+                prev->next = pair->next;
+            }
+            free(pair->key);
+            free(pair->val);
+            free(pair);
+            return true;
+        }
+        prev = pair;
+        pair = pair->next;
+    }
+    return false;
+}
+
 void print_hash_table(){
     size_t length = sizeof(hash_table) / sizeof(hash_table[0]);
     for (int i = 0 ; i < length ; i++) {
@@ -114,6 +139,8 @@ int main() {
     set(pair_1.key, pair_1.val, 2000);
     set(pair_2.key, pair_2.val, 2000);
     set(pair_3.key, pair_3.val, 1);
+    printf("\n\n======TABLE=====\n");
+    print_hash_table();
 
     sleep(2);
 
@@ -126,14 +153,18 @@ int main() {
     char *val_2 = get(key_2);
     char *val_3 = get(key_3);
     char *val_4 = get(key_4);
-    printf("======KEY-VALS======\n");
+    printf("\n\n======KEY-VALS======\n");
     printf("%10s : %10s\n", key_1, val_1);
     printf("%10s : %10s\n", key_2, val_2);
     printf("%10s : %10s\n", key_3, val_3);
     printf("%10s : %10s\n", key_4, val_4);
 
-    printf("\n\n======TABLE=====\n\n");
-    print_hash_table();
+    printf("\n\n=====DELETE=====\n");
+    bool del1 = delete("123");
+    bool del2 = delete("222");
+    printf("Bool 1: %d\n", del1);
+    printf("Bool 2: %d\n", del2);
+
 
     free(pair_1.key);
     free(pair_1.val);
