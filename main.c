@@ -52,6 +52,34 @@ void set(const char *key, const char *val, int ttl){
     hash_table[hashed_key] = new_pair;
 }
 
+char *get(const char *key){
+    unsigned int slot = hash(key);
+    kv_pair_t *pair = hash_table[slot];
+    kv_pair_t *prev = NULL;
+    time_t now = time(NULL);
+
+    while (pair != NULL){
+        if (strcmp(pair->key, key) == 0){
+            if(pair->expiration > now || pair->expiration == 0){
+                return pair->val;
+            } else {
+                if (prev == NULL){
+                    pair = pair->next;
+                } else {
+                    prev->next = pair -> next;
+                }
+                free(pair->key);
+                free(pair->val);
+                free(pair);
+                return NULL;
+            }
+        }
+        prev = pair;
+        pair = pair->next;
+    }
+    return NULL;
+}
+
 void print_hash_table(){
     size_t length = sizeof(hash_table) / sizeof(hash_table[0]);
     for (int i = 0 ; i < length ; i++) {
@@ -84,8 +112,24 @@ int main() {
     
     set(pair_1.key, pair_1.val, 2000);
     set(pair_2.key, pair_2.val, 2000);
-    set(pair_3.key, pair_3.val, 2000);
+    set(pair_3.key, pair_3.val, 1);
 
+
+    char *key_1 = "123";
+    char *key_2 = "345";
+    char *key_3 = "exampleKey";
+    char *key_4 = "missing";
+    char *val_1 = get(key_1);
+    char *val_2 = get(key_2);
+    char *val_3 = get(key_3);
+    char *val_4 = get(key_4);
+    printf("======KEY-VALS======\n");
+    printf("%10s : %10s\n", key_1, val_1);
+    printf("%10s : %10s\n", key_2, val_2);
+    printf("%10s : %10s\n", key_3, val_3);
+    printf("%10s : %10s\n", key_4, val_4);
+
+    printf("\n\n======TABLE=====\n\n");
     print_hash_table();
 
     free(pair_1.key);
