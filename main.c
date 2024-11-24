@@ -5,6 +5,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <pthread.h>
+#include "cleanup.h"
 
 #define TABLE_SIZE 1000
 #define INPUT_BUFFER_SIZE 256
@@ -121,6 +123,12 @@ void print_hash_table(){
 
 int main() {
     char input[INPUT_BUFFER_SIZE];
+
+    pthread_t cleanup_thread;
+    if (pthread_create(&cleanup_thread, NULL, cleanup_expired_keys, NULL) != 0){
+        fprintf(stderr, "Error creating cleaup thread\n");
+        return EXIT_FAILURE;
+    }
 
     while (1) {
         printf("\n======MikeDB======\n");

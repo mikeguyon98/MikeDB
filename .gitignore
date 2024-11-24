@@ -1,3 +1,5 @@
 .cursor/
 .vscode/
 *.dSYM/
+testing.c
+testing
