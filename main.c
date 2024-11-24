@@ -4,8 +4,10 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #define TABLE_SIZE 1000
+#define INPUT_BUFFER_SIZE 256
 
 typedef struct kv_pair {
     char *key;
@@ -89,7 +91,7 @@ bool delete(const char *key){
     time_t now = time(NULL);
 
     while (pair != NULL){
-        if(strcmp(key, pair->key)){
+        if(strcmp(key, pair->key)==0){
             if(prev==NULL){
                 hash_table[slot] = pair->next;
             } else {
@@ -118,60 +120,65 @@ void print_hash_table(){
 }
 
 int main() {
-    kv_pair_t pair_1 = {
-        .key = strdup("exampleKey"),
-        .val = strdup("exampleValue"),
-        .next = NULL
-    };
+    char input[INPUT_BUFFER_SIZE];
 
-    kv_pair_t pair_2 = {
-        .key = strdup("123"),
-        .val = strdup("Mike"),
-        .next = NULL
-    };
-    
-    kv_pair_t pair_3 = {
-        .key = strdup("345"),
-        .val = strdup("Dan"),
-        .next = NULL
-    };
-    
-    set(pair_1.key, pair_1.val, 2000);
-    set(pair_2.key, pair_2.val, 2000);
-    set(pair_3.key, pair_3.val, 1);
-    printf("\n\n======TABLE=====\n");
-    print_hash_table();
+    while (1) {
+        printf("\n======MikeDB======\n");
+        if (fgets(input, INPUT_BUFFER_SIZE, stdin) == NULL) {
+            // Handle EOF (Ctrl+D)
+            break;
+        }
+        input[strcspn(input, "\n")] = '\0';
 
-    sleep(2);
+        char *command = strtok(input, " ");
+        if (command == NULL) {
+            continue;
+        }
 
+        for (char *p = command; *p; ++p) {
+            *p = toupper(*p);
+        }
 
-    char *key_1 = "123";
-    char *key_2 = "345";
-    char *key_3 = "exampleKey";
-    char *key_4 = "missing";
-    char *val_1 = get(key_1);
-    char *val_2 = get(key_2);
-    char *val_3 = get(key_3);
-    char *val_4 = get(key_4);
-    printf("\n\n======KEY-VALS======\n");
-    printf("%10s : %10s\n", key_1, val_1);
-    printf("%10s : %10s\n", key_2, val_2);
-    printf("%10s : %10s\n", key_3, val_3);
-    printf("%10s : %10s\n", key_4, val_4);
+        char *arg1 = strtok(NULL, " ");
+        char *arg2 = strtok(NULL, " ");
+        char *arg3 = strtok(NULL, " ");
 
-    printf("\n\n=====DELETE=====\n");
-    bool del1 = delete("123");
-    bool del2 = delete("222");
-    printf("Bool 1: %d\n", del1);
-    printf("Bool 2: %d\n", del2);
-
-
-    free(pair_1.key);
-    free(pair_1.val);
-    free(pair_2.key);
-    free(pair_2.val);
-    free(pair_3.key);
-    free(pair_3.val);
-
+        if (strcmp(command, "GET") == 0){
+            if (arg1 == NULL) {
+                printf("usage: GET <key>\n");
+                continue;
+            }
+            char *value = get(arg1);
+            if (value != NULL) {
+                printf("%s\n", value);
+            } else {
+                printf("(nil)\n");
+            }
+        } else if (strcmp(command, "SET") == 0){
+            if (arg1 == NULL || arg2 == NULL) {
+                printf("usage: SET <key> <value> <exipiration (optional)>\n");
+                continue;
+            }
+            int expiration = arg3 != NULL ? atoi(arg3) : 0;
+            set(arg1, arg2, expiration);
+            printf("INSERTED\n");
+        } else if (strcmp(command, "DELETE") == 0){
+            if (arg1 == NULL){
+                printf("usage: DELETE <key>\n");
+                continue;
+            }
+            bool deleted = delete(arg1);
+            if (deleted) {
+                printf("DELETED\n");
+            } else {
+                printf("NOT FOUND\n");
+            }
+        } else if (strcmp(command, "EXIT") == 0){
+            break;
+        } else {
+            printf("Invalid input\n");
+        }
+    }
+    printf("EXITING.....\n");
     return 0;
 }
