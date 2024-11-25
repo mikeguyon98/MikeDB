@@ -14,6 +14,5 @@ typedef struct kv_pair {
 
 extern kv_pair_t *hash_table[TABLE_SIZE];
 
-void *cleanup_expired_keys(void *arg);
 
 #endif // MAIN_H

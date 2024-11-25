@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <pthread.h>
-#include "cleanup.h"
-#include "commands.h"
+#include "../cleanup/cleanup.h"
+#include "../commands/commands.h"
 
 #define TABLE_SIZE 1000
 #define INPUT_BUFFER_SIZE 256
@@ -23,10 +23,10 @@ kv_pair_t *hash_table[TABLE_SIZE];
 
 void print_hash_table(){
     size_t length = sizeof(hash_table) / sizeof(hash_table[0]);
-    for (int i = 0 ; i < length ; i++) {
+    for (size_t i = 0 ; i < length ; i++) {
         kv_pair_t *pair = hash_table[i];
         while (pair != NULL) {
-            printf("slot: %d \t | key: %10s \t | val: %s \n", i, pair->key, pair->val);
+            printf("slot: %zu \t | key: %10s \t | val: %s \n", i, pair->key, pair->val);
             pair = pair->next;
         }
     }

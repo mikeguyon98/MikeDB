@@ -5,7 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "main.h"
+#include "../main/main.h"
 
 unsigned int hash(const char *key){
     unsigned long int val = 0;
@@ -77,8 +77,7 @@ bool delete(const char *key){
     unsigned int slot = hash(key);
     kv_pair_t *pair = hash_table[slot];
     kv_pair_t *prev = NULL;
-    time_t now = time(NULL);
-
+    
     while (pair != NULL){
         if(strcmp(key, pair->key)==0){
             if(prev==NULL){

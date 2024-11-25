@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "main.h"
+#include "../main/main.h"
 
 #define CLEANUP_INTERVAL 60
 
