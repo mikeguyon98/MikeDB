@@ -1,4 +1,4 @@
 # MikeDB
 
 #Compilation
-`clang main.c cleanup.c -o your_program -lpthread`
+`clang main.c cleanup.c commands.c -o ./MikeDB -lpthread`
